@@ -1,0 +1,62 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+ 
+	<context:component-scan base-package="com.rohit"  />
+    <mvc:annotation-driven />
+	<context:property-placeholder location="classpath:config/database.properties"/>
+	<tx:annotation-driven transaction-manager="myTransactionManager"/>
+	
+   
+   	<bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/view/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+    
+    <bean id="myDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    	<property name="driverClassName" value="${connection.driver_class}"/>
+		<property name="url" value="${connection.url}"/>
+		<property name="username" value="${connection.username}"/>
+		<property name="password" value="${connection.password}"/>
+    </bean>
+    
+     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value = "${connection.driver_class}" />
+        <property name="jdbcUrl" value = "${connection.url}" />
+        <property name="user" value = "${connection.username}" />
+        <property name="password" value = "${connection.password}" />
+        <property name="initialPoolSize" value = "${connection.pool_size}" />
+    </bean>
+    
+    <bean id="mySessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+    	<property name="dataSource" ref="myDataSource" />
+    	<property name="packagesToScan" value="com.rohit" />
+    	<property name="hibernateProperties">
+        	<props>
+            	<prop key="hibernate.show_sql">${show_sql}</prop>
+            	<prop key="hibernate.dialect">${dialect}</prop>
+        	</props>
+    	</property>
+	</bean>
+	
+	<bean id="myTransactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+    	<property name="sessionFactory" ref="mySessionFactory" />
+	</bean>
+    
+ 
+</beans>
